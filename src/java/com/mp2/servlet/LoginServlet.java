@@ -83,20 +83,18 @@ public class LoginServlet extends HttpServlet {
                         return;
                     } else {
                         // Error 3: Both incorrect (not blank)
-                        // This case: username not found + password was entered
                         response.sendRedirect("error_3.jsp");
                         return;
                     }
                 }
             }
         } catch (NullValueException e) {
-            // Triggers noLoginCredentials.jsp via web.xml mapping
+            // Map to noLoginCredentials.jsp
             throw new ServletException(e);
         } catch (SQLException e) {
             e.printStackTrace();
-            // Optional: throw AuthenticationException to show error_5.jsp 
-            // OR redirect to error_3.jsp as a general system error
             response.sendRedirect("error_3.jsp");
+            return;
         }
     }
 }
