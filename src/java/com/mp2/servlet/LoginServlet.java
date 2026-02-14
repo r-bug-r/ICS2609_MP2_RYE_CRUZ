@@ -41,14 +41,19 @@ public class LoginServlet extends HttpServlet {
         String user = request.getParameter("username");
         String pass = request.getParameter("password");
 
+        // Normalize inputs
+        if (user == null) user = "";
+        if (pass == null) pass = "";
+        user = user.trim();
+        pass = pass.trim();
+
         try {
-            // NullValueException Check
-            if ((user == null || user.trim().isEmpty()) && (pass == null || pass.trim().isEmpty())) {
-                throw new NullValueException("Username and Password are required.");
+            // NullValueException Check: Both username and password left blank
+            if (user.isEmpty() && pass.isEmpty()) {
+                throw new NullValueException("Credentials missing");
             }
 
             try (Connection conn = DriverManager.getConnection(dbURL, dbUser, dbPass)) {
-                // Check if user exists
                 String sql = "SELECT * FROM USERS WHERE username = ?";
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ps.setString(1, user);
@@ -59,32 +64,39 @@ public class LoginServlet extends HttpServlet {
                     String role = rs.getString("role");
 
                     if (dbPassVal.equals(pass)) {
-                        // Success
+                        // Success Page
                         HttpSession session = request.getSession();
                         session.setAttribute("user", user);
                         session.setAttribute("role", role);
                         response.sendRedirect("success.jsp");
+                        return;
                     } else {
-                        // Correct user, wrong password (error_2)
+                        // Error 2: Correct username, incorrect password
                         response.sendRedirect("error_2.jsp");
+                        return;
                     }
                 } else {
-                    // Username not found
-                    if (pass == null || pass.trim().isEmpty()) {
-                        // error_1.jsp (Username not in DB, password blank)
+                    // Username not found in DB
+                    if (pass.isEmpty()) {
+                        // Error 1: Username not in DB, password blank
                         response.sendRedirect("error_1.jsp");
+                        return;
                     } else {
-                        // error_3.jsp (Username and password both incorrect, not blank)
+                        // Error 3: Both incorrect (not blank)
+                        // This case: username not found + password was entered
                         response.sendRedirect("error_3.jsp");
+                        return;
                     }
                 }
             }
         } catch (NullValueException e) {
-            throw new ServletException(e); // noLoginCredentials.jsp
+            // Triggers noLoginCredentials.jsp via web.xml mapping
+            throw new ServletException(e);
         } catch (SQLException e) {
-            // Log the actual DB error
             e.printStackTrace();
-            throw new ServletException("Database Error", e);
+            // Optional: throw AuthenticationException to show error_5.jsp 
+            // OR redirect to error_3.jsp as a general system error
+            response.sendRedirect("error_3.jsp");
         }
     }
 }
