@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <display-name>ICS2609_2A_RYE_GROUP</display-name>
+    
+    <!-- ServletContext Parameters for Header and Footer -->
+    <context-param>
+        <param-name>headerTitle</param-name>
+        <param-value>Bugtong, Ryekarlo P. &amp; Cruz, Fulbert Francis A. - MP2 Console</param-value>
+    </context-param>
+    <context-param>
+        <param-name>footerText</param-name>
+        <param-value>© 2026 Developed by Bugtong &amp; Cruz. All Rights Reserved.</param-value>
+    </context-param>
+
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.mp2.servlet.LoginServlet</servlet-class>
+        <!-- ServletConfig Parameters for Database -->
+        <init-param>
+            <param-name>dbDriver</param-name>
+            <param-value>org.apache.derby.jdbc.ClientDriver</param-value>
+        </init-param>
+        <init-param>
+            <param-name>dbURL</param-name>
+            <param-value>jdbc:derby://localhost:1527/LoginDB;create=true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>dbUser</param-name>
+            <param-value>app</param-value>
+        </init-param>
+        <init-param>
+            <param-name>dbPassword</param-name>
+            <param-value>app</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/LoginServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>com.mp2.servlet.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/LogoutServlet</url-pattern>
+    </servlet-mapping>
+
+    <session-config>
+        <session-timeout>5</session-timeout>
+    </session-config>
+    
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!-- Error Page Declarations (At least 5) -->
+    <error-page>
+        <exception-type>com.mp2.exception.NullValueException</exception-type>
+        <location>/noLoginCredentials.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>com.mp2.exception.AuthenticationException</exception-type>
+        <location>/error_5.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error_4.jsp</location>
+    </error-page>
+    <!-- Use 500 specifically for backend crashes, not logic redirects -->
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error_3.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/error_session.jsp</location>
+    </error-page>
+</web-app>
